@@ -1,0 +1,20 @@
+{
+    "storage": {
+        "nas":
+        {
+            "synology": "1.19.3.2764-ef515a800"
+        }
+    },
+    "networking":
+    {
+        "firewall":
+        {
+            "pfsense": "2.4.5"
+        },
+        "unifi":
+        {
+            "cloudkey": "1.1.11"
+        }
+    }
+
+}
