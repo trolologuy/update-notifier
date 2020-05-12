@@ -1,8 +1,13 @@
 {
-    "storage": {
+    "storage": 
+    {
         "nas":
         {
-            "synology": "1.19.3.2764-ef515a800"
+            "synology":
+            {
+                "plex": "1.19.3.2764-ef515a800",
+                "dsm": "6.2.3"
+            } 
         }
     },
     "networking":
@@ -14,6 +19,13 @@
         "unifi":
         {
             "cloudkey": "1.1.11"
+        }
+    },
+    "hosting": 
+    {
+        "cms":
+        {
+            "wordpress": "5.4.1"
         }
     }
 

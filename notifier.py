@@ -21,7 +21,7 @@ def notifier(message, programs):
 
 
 def telegram(message, programs):
-    print("sending message through telegram")
+    print("\n\nsending message through telegram ...")
     programs_as_string = ""
     for i in programs:
         programs_as_string += i
@@ -31,12 +31,11 @@ def telegram(message, programs):
     r = requests.post(
         url, data={"chat_id": CHAT_ID, "text": message + programs_as_string}
     )
+    print("... message sent !")
 
 
 def notify(res, programs):
-    if res is 0:
+    if res is True:
         notifier("✅ All the programs are up to date. \n", '')
-    elif res is 1:
+    elif res is False:
         notifier("⚠️ The following program(s) require an update: \n", programs)
-    else:
-        print("The build status could not be retrieved")

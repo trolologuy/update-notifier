@@ -1,3 +1,4 @@
-setting.ini
 DS_STORE
 __pycache__
+settings.ini
+*.log

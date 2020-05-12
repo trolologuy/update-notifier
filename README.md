@@ -5,8 +5,18 @@
 Notifies you when updates for the selected software is available.
 Only supports telegram bot notification for now.
 
+### Features
+- Supports Bot Telegram notifications
+- Supports the following websites / services :
+   - plex
+   - synology DSM version
+   - pfsense
+   - unifi cloud key
+   - wordpress
+
 ## Prerequisites
 - Having Python 3 installed
+- Having [geckodriver](https://github.com/mozilla/geckodriver/releases/)
 
 ## Installation
 1. Run the following command to install the required modules locally
@@ -21,16 +31,6 @@ Only supports telegram bot notification for now.
 ### Telegram
 If you need help getting the `BOT_TOKEN` and `CHAT_ID` variables, please follow the *steps 1* and *2* in this [gist](https://gist.github.com/trolologuy/c290ac3edc46fe6bc2b69ccc497cd4bc)
 
-# Similar project
-[nvchecker](https://github.com/lilydjwg/nvchecker)
-
-## TO DO
-- [x] add .ini file parsing
-- [x] add telegram support
-- [ ] add download link to the latest version of the software (to be added in the `installed.json`)
-- [ ] add better error handling
-- [ ] add testing
-- [ ] add CI / CD
-- [ ] add installation as a package
-- [ ] add more options for the `installed.json` file
-- [ ] add other possibilities for the notifications
+# Similar projects
+* [anitya](https://github.com/fedora-infra/anitya)
+* [nvchecker](https://github.com/lilydjwg/nvchecker)
