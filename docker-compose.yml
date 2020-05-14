@@ -1,0 +1,8 @@
+version: "3"
+services:
+  update-notifier:
+    container_name: update-notifier
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile
+    image: update-notifier:latest

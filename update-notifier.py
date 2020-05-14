@@ -10,9 +10,12 @@ If not, a telegram notification is sent.
 import os
 import sys
 import json
+import click
 import getopt
+import progress
 import requests
 import regex as re
+from progress.bar import IncrementalBar
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from configparser import ConfigParser
@@ -148,26 +151,46 @@ def wordpress():
 
 def message(service, up_to_date, latest, installed):
     if up_to_date is True:
-        print(service + " is up to date \n")
+        click.echo(" - " + click.style(service, fg='yellow') + click.style(" is up to date.", fg='green'))
     elif up_to_date is False:
-        print(service + " is not up to date")
-        print("Latest version available is: " + latest)
-        print("You are using: "+ installed + '\n')
+        click.echo(" - " + click.style(service, fg='yellow') + click.style(" is not up to date.", fg='red'))
+        click.echo("   Latest version available is: " + click.style(latest, fg='blue'))
+        click.echo("   You are using:: " + click.style(installed, fg='cyan'))
 
 def main(inputfile):
     """The main function"""
     programs = []
     up_to_date = True
-
+    click.echo(click.style("""
++---------------------------------------------------------------------------------------------------------+
+|                           _                                              _   ___  _                     |
+|                          | |        _                              _    (_) / __)(_)                    |
+|         _   _  ____    _ | |  ____ | |_   ____  ___  ____    ___  | |_   _ | |__  _   ____   ____       |
+|        | | | ||  _ \  / || | / _  ||  _) / _  )(___)|  _ \  / _ \ |  _) | ||  __)| | / _  ) / ___)      |
+|        | |_| || | | |( (_| |( ( | || |__( (/ /      | | | || |_| || |__ | || |   | |( (/ / | |          |
+|         \____|| ||_/  \____| \_||_| \___)\____)     |_| |_| \___/  \___)|_||_|   |_| \____)|_|          |
+|             |_|                                                                                         |
++---------------------------------------------------------------------------------------------------------+
+   """, fg='yellow'))
+    print('Gathering informations...\n')
     with open(inputfile) as f:
         data = json.load(f)
 
-    latest_pfsense_version = pfsense()
-    latest_synology_dsm_version = synology_dsm()
-    latest_synology_plex_version = synology_plex()["nas"]["Synology"]["version"]
-    latest_unifi_ck_version = unifi()
-    latest_wordpress_version = wordpress()["offers"][0]["current"]
-
+    # Progressbar
+    bar = IncrementalBar('Processing', max=5)
+    for i in range(1):
+        latest_pfsense_version = pfsense()
+        bar.next()
+        latest_synology_dsm_version = synology_dsm()
+        bar.next()
+        latest_synology_plex_version = synology_plex()["nas"]["Synology"]["version"]
+        bar.next()
+        latest_unifi_ck_version = unifi()
+        bar.next()
+        latest_wordpress_version = wordpress()["offers"][0]["current"]
+        bar.next()
+        bar.finish()
+    print("\n")
     installed_pfsense_version = data["networking"]["firewall"]["pfsense"]
     installed_synology_dsm_version = data["storage"]["nas"]["synology"]["dsm"]
     installed_synology_plex_version = data["storage"]["nas"]["synology"]["plex"]

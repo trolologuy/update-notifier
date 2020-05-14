@@ -1,0 +1,5 @@
+env:
+    - DOCKER_COMPOSE_VERSION=1.4.2
+
+script:
+    - docker-compose up

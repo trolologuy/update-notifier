@@ -1,0 +1,13 @@
+Vagrant.configure(2) do |config|
+  config.vm.box = "hashicorp/bionic64"
+  config.vm.network "forwarded_port", guest: 80, host: 80
+  config.vm.network "forwarded_port", guest: 443, host: 443
+  config.vm.provider "virtualbox" do |vb|
+    vb.cpus = 4
+    vb.memory = 4096
+  end
+  config.vm.hostname = "update-notifer"
+  config.vm.synced_folder "../../", "/vagrant"
+  config.ssh.extra_args = ["-t", "cd /vagrant; bash --login"]
+  config.vm.provision "shell", path: "Vagrant.Provision.sh", privileged: false
+end
