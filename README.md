@@ -42,7 +42,7 @@ If you need help getting the `BOT_TOKEN` and `CHAT_ID` variables, please follow 
 
 ### Docker
 1. Install Docker
-2. Run `docker build -f deploy/Dockerfile .`
+2. Run either `docker-compose up` or`docker build -f deploy/Dockerfile .` if you want to use the Dockerfile directly.
 
 ### Vagrant
 1. Install Vagrant

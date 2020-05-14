@@ -6,34 +6,65 @@ import requests
 from configparser import ConfigParser
 
 parser = ConfigParser()
-parser.read("settings.ini")
+try:
+    parser.read("settings.ini")
+except Exception as e:
+    error("Error: The config file could not be validated.\nPlease check that the file exists and is valid")
+    raise SystemExit("")
 
-NOTIFIER = parser.get("settings", "NOTIFIER")
+def default(message):
+    click.secho(message, fg='white')
+
+def warning(message):
+    click.secho(message, fg='blue', blink=True, bold=True)
+
+def error(message):
+    click.secho(message, fg='red')
 
 def prerequisites():
-    global BOT_TOKEN 
+    global BOT_TOKEN
     global CHAT_ID
-    BOT_TOKEN = os.environ.get('BOT_TOKEN')
-    CHAT_ID = os.environ.get('CHAT_ID')
+    BOT_TOKEN = os.environ.get("BOT_TOKEN")
+    CHAT_ID = os.environ.get("CHAT_ID")
+    NOTIFIER = os.environ.get("NOTIFIER")
 
-    if os.environ.get('BOT_TOKEN') is None:
-        BOT_TOKEN = parser.get("telegram", "BOT_TOKEN")
-    if os.environ.get('CHAT_ID') is None:
-        CHAT_ID = parser.get("telegram", "CHAT_ID")
+    if os.environ.get("BOT_TOKEN") is None:
+        try:
+            BOT_TOKEN = parser.get("telegram", "BOT_TOKEN")
+        except Exception as e:
+            error("\nError: The config file could not be validated.\nPlease check that the file exists and is valid")
+            raise SystemExit("")
+    if os.environ.get("CHAT_ID") is None:
+        try:
+            CHAT_ID = parser.get("telegram", "CHAT_ID")
+        except Exception as e:
+            error("\nError: The config file could not be validated.\nPlease check that the file exists and is valid")
+            raise SystemExit("")
+    if os.environ.get("NOTIFIER") is None:
+        try:
+            NOTIFIER = parser.get("settings", "NOTIFIER")
+        except Exception as e:
+            error("\nError: The config file could not be validated.\nPlease check that the file exists and is valid")
+            raise SystemExit("")
     if BOT_TOKEN == "your_bot_token":
-        print("The Telegram token was not updated from it's default value.\nPlease consult the README.md for more details")
+        error(
+            "\nError: Sending failed. The Telegram token was not updated from its default value.\nPlease consult the README.md for more details"
+        )
         exit()
     elif CHAT_ID == "your_chat_id":
-        print("The Telegram chat id was not updated from it's default value.\nPlease consult the README.md for more details")
+        error(
+            "\nError: Sending failed. The Telegram chat id was not updated from its default value.\nPlease consult the README.md for more details"
+        )
         exit()
     if NOTIFIER != "telegram":
-        print(
-            "Error: No valid notifier was specified. Please check your 'settings.ini' file"
+        error(
+            "\nError: No valid notifier was specified. Please check your 'settings.ini' file"
         )
         exit()
 
+
 def telegram(message, programs):
-    print("\n\nsending message through telegram ...")
+    default("\n\nsending message through telegram ...")
     programs_as_string = ""
     for i in programs:
         programs_as_string += i
@@ -42,7 +73,7 @@ def telegram(message, programs):
     r = requests.post(
         url, data={"chat_id": CHAT_ID, "text": message + programs_as_string}
     )
-    click.secho("message sent !", fg='green')
+    click.secho("message sent !", fg="green")
 
 
 def notify(res, programs):

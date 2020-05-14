@@ -6,7 +6,7 @@
             "synology":
             {
                 "plex": "1.19.3.2764-ef515a800",
-                "dsm": "6.2.2"
+                "dsm": "6.2.3"
             } 
         }
     },
@@ -14,7 +14,7 @@
     {
         "firewall":
         {
-            "pfsense": "2.4.4"
+            "pfsense": "2.4.5"
         },
         "unifi":
         {
@@ -25,7 +25,7 @@
     {
         "cms":
         {
-            "wordpress": "5.4.0"
+            "wordpress": "5.4.1"
         }
     }
 
