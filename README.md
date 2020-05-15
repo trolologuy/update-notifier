@@ -21,12 +21,19 @@ Notifies you when updates for the selected software is available.
 - Having Python 3 installed
 - Having [geckodriver](https://github.com/mozilla/geckodriver/releases/) installed in `/usr/local/bin/geckodriver`(or edit the path in the `SELENIUM` variable in the `settings.ini` file)
 
-## Configuration & Installation
+## Installation
 1. Rename the `settings.example.ini` to `settings.ini`
 2. Edit the `settings.ini` and add your credentials (more explanation regarding the variables below).
 3. Edit the `installed.json` and add the value of the __exact__ version of the software you are currently using.
 4. Run the following command to install the required modules locally `pip3 install -U -r requirements.txt --user`
 
+You could run this project in docker with a cronjob, so that the update checks are run once a day or once a week for example.
+
+### Usage
+`python3 update-notifier.py -i installed.json`
+
+
+## Configuration file (settings.ini)
 ### [settings]
 - `NOTIFIER` by default `telegram` since currently nothing else is supported.
 - `SELENIUM` by default `/usr/local/bin/geckodriver` since that's where I decided to install it for docker and vagrant. If you install *geckodriver* manually you may have to adapt this path.
@@ -37,12 +44,16 @@ Notifies you when updates for the selected software is available.
 - `CHAT_ID` Please update this ID accordingly (more details below).
 If you need help getting the `BOT_TOKEN` and `CHAT_ID` variables, please follow the *steps 1 and *2* in this [gist](https://gist.github.com/trolologuy/c290ac3edc46fe6bc2b69ccc497cd4bc)
 
-### Usage
-`python3 update-notifier.py -i installed.json`
+
+## Deployment
+
+You can also deploy the project through docker or vagrant.
 
 ### Docker
 1. Install Docker
-2. Run either `docker-compose up` or`docker build -f deploy/Dockerfile .` if you want to use the Dockerfile directly.
+2. Run either `docker-compose up` or `docker build -t update-notifier -f deploy/Dockerfile .` and `docker run -d --name notify update-notifier` if you want to use the Dockerfile directly.
+
+__Important Note__: Since the content of the repo is copied into the container, everytime you modify one of the files you will have to rebuild the image and start a container using that freshly built image.
 
 ### Vagrant
 1. Install Vagrant

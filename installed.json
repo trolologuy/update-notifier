@@ -14,11 +14,11 @@
     {
         "firewall":
         {
-            "pfsense": "2.4.5"
+            "pfsense": "2.4.4"
         },
         "unifi":
         {
-            "cloudkey": "1.1.11"
+            "cloudkey": "1.1.10"
         }
     },
     "hosting": 
