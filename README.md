@@ -51,7 +51,7 @@ You can also deploy the project through docker or vagrant.
 
 ### Docker
 1. Install Docker
-2. Run either `docker-compose up` or `docker build -t update-notifier -f deploy/Dockerfile .` and `docker run -d --name notify update-notifier` if you want to use the Dockerfile directly.
+2. Run either `docker-compose up` or `docker build -t update-notifier -f deploy/Dockerfile .` and `docker run --rm -d --name notify update-notifier` if you want to use the Dockerfile directly. We are using the parameter `--rm` to auto-delete the container once it has sent the notification.
 
 __Important Note__: Since the content of the repo is copied into the container, everytime you modify one of the files you will have to rebuild the image and start a container using that freshly built image.
 

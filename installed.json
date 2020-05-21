@@ -14,7 +14,7 @@
     {
         "firewall":
         {
-            "pfsense": "2.4.4"
+            "pfsense": "2.4.5"
         },
         "unifi":
         {
