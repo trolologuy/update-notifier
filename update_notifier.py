@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# pylint: disable=line-too-long
 """
 Update Notifier script v0.1
 The purpose of this script is to parse
@@ -10,23 +11,25 @@ If not, a telegram notification is sent.
 import os
 import sys
 import json
-import click
 import getopt
-import progress
+from configparser import ConfigParser
+from json.decoder import JSONDecodeError
+import click
 import requests
 import regex as re
 from progress.bar import IncrementalBar
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from configparser import ConfigParser
 from notifier import notify
 
-parser = ConfigParser()
+PARSER = ConfigParser()
 try:
-    parser.read("settings.ini")
-except Exception as e:
-    error("Error: The config file could not be validated.\nPlease check that the file exists and is valid")
-    raise SystemExit("")
+    PARSER.read("settings.ini")
+except Exception as error_message:
+    error(
+        "Error: The config file could not be validated.\nPlease check that the file exists and is valid"
+    )
+    raise SystemExit(error_message)
 
 PFSENSE = "Pfsense"
 PLEX = "Plex"
@@ -34,22 +37,48 @@ SYNOLOGY_DSM = "Synology DSM"
 UNIFI_CC = "Unifi Cloud Key Controller"
 WORDPRESS = "Wordpress"
 
+
 def default(message):
-    click.secho(message, fg='white')
+    """Default message used as an alternative to print()"""
+    click.secho(message, fg="white")
+
 
 def warning(message):
-    click.secho(message, fg='blue', blink=True, bold=True)
+    """Default warning message used as an alternative to print()"""
+    click.secho(message, fg="blue", blink=True, bold=True)
+
 
 def error(message):
-    click.secho(message, fg='red')
+    """Default error message used as an alternative to print()"""
+    click.secho(message, fg="red")
 
-def prerequisites():
-    """Makes sure Python 3 is used and the default values have been updated"""
-    global HEALTHCHECK
-    global SELENIUM
-    HEALTHCHECK = os.environ.get("HEALTHCHECK")
-    SELENIUM = os.environ.get("SELENIUM")
 
+def env_checker(token, section):
+    """
+    Checks if the variable are set in the env,
+    if not, the settings file is being read and the values are extracted and set
+    """
+    if os.environ.get(token):
+        return os.environ.get(token)
+    elif os.environ.get(token) is None:
+        try:
+            if token == "HEALTHCHECK":
+                return PARSER.get(section, token)
+            elif token == "SELENIUM":
+                return PARSER.get(section, token)
+            else:
+                return None
+        except Exception as error_message:
+            error(
+                "\nError: The config file could not be validated.\nPlease check that the file exists and is valid"
+            )
+            default(error_message)
+            raise SystemExit("")
+    else:
+        return None
+
+
+def check_python_version():
     if not sys.version_info.major == 3 and sys.version_info.minor >= 6:
         error("Error: this script requires Python 3.6 or higher")
         error(
@@ -59,27 +88,43 @@ def prerequisites():
         )
         default("Please use: python3 ./main.py")
         sys.exit(2)
+
+
+def prerequisites():
+    """Makes sure Python 3 is used and the default values have been updated"""
+    global HEALTHCHECK
+    global SELENIUM
+    HEALTHCHECK = os.environ.get("HEALTHCHECK")
+    SELENIUM = os.environ.get("SELENIUM")
+
+    check_python_version()
     default("Reading settings.ini ...")
-    if os.environ.get("HEALTHCHECK") is None:
-        try:
-            HEALTHCHECK = parser.get("settings", "HEALTHCHECK")
-        except Exception as e:
-            error("Error: The config file could not be validated.\nPlease check that the file exists and is valid")
-            raise SystemExit("")
-    if os.environ.get("SELENIUM") is None:
-        try:
-            SELENIUM = parser.get("settings", "SELENIUM")
-        except Exception as e:
-            error("Error: The config file could not be validated.\nPlease check that the file exists and is valid")
-            raise SystemExit("")
+    HEALTHCHECK = env_checker("HEALTHCHECK", "settings")
+    SELENIUM = env_checker("SELENIUM", "settings")
+
+    # if os.environ.get("HEALTHCHECK") is None:
+    #     try:
+    #         HEALTHCHECK = PARSER.get("settings", "HEALTHCHECK")
+    #     except Exception as error_message:
+    #         error(
+    #             "Error: The config file could not be validated.\nPlease check that the file exists and is valid"
+    #         )
+    #         raise SystemExit(error_message)
+    # if os.environ.get("SELENIUM") is None:
+    #     try:
+    #         SELENIUM = PARSER.get("settings", "SELENIUM")
+    #     except Exception as error_message:
+    #         error(
+    #             "Error: The config file could not be validated.\nPlease check that the file exists and is valid"
+    #         )
+    #         raise SystemExit(error_message)
     if HEALTHCHECK == "https://some-domain.com/and_some_token":
-        warning(
-            "The Healthchecks url was not updated from its default value.\n"
-        )
+        warning("The Healthchecks url was not updated from its default value.\n")
     if SELENIUM == "/usr/local/bin/geckodriver":
         warning(
             "Using the default location for the geckodriver: '/usr/local/bin/geckodriver'.\nYou can change this setting under 'SELENIUM' in the 'settings.ini' file."
         )
+
 
 def get_arg(argv):
     """Get the command line arguments"""
@@ -107,14 +152,18 @@ def get_arg(argv):
 
     # check if both files exist
     if not os.path.isfile(inputfile):
-        error("Error: the input file", inputfile, "does not exist")
+        error("Error: the input file" + inputfile + "does not exist")
         sys.exit(2)
 
     main(inputfile)
 
 
 def get_json_from_url(url):
-    response = requests.get(url)
+    """
+    Gets the url given as parameter and returns the whole object
+    """
+    headers = {"User-agent": "Mozilla/5.0"}
+    response = requests.get(url, headers=headers)
     return response
 
 
@@ -126,6 +175,7 @@ def create_headless_firefox_browser():
 
 
 def check_numbers_or_dots(to_clean):
+    """Cleans the input"""
     expression = r"([0-9].[0-9]*.[0-9]*)/"
     result = re.search(expression, to_clean)
     if result:
@@ -148,12 +198,12 @@ def pfsense():
         print(
             "Error: The current version of the unifi cloudkey controller could not be retrieved !"
         )
-        return None
+        return "no version could be retrieved"
 
 
 def synology_dsm():
     """Returns the latest version available for DSM on synology."""
-    expression = r"<p> (.*) <\/p>"
+    # expression = r"<p> (.*) <\/p>"
     result = []
     page = requests.get("https://archive.synology.com/download/DSM/release/")
     soup = BeautifulSoup(page.text, "html.parser")
@@ -167,7 +217,8 @@ def synology_dsm():
 def synology_plex():
     """Returns the latest version available for plex on synology."""
     data = get_json_from_url("https://plex.tv/api/downloads/5.json")
-    return data.json()
+    result = data.json()
+    return result["nas"]["Synology"]["version"]
 
 
 def unifi():
@@ -190,16 +241,24 @@ def unifi():
         error(
             "Error: The current version of the unifi cloudkey controller could not be retrieved !"
         )
-        return None
+        return "no version could be retrieved"
 
 
 def wordpress():
     """Returns the latest version available for wordpress."""
-    data = get_json_from_url("https://api.wordpress.org/core/version-check/1.7/")
-    return data.json()
+    try:
+        data = get_json_from_url("https://api.wordpress.org/core/version-check/1.7/")
+        result = data.json()
+        return result["offers"][0]["current"]
+    except JSONDecodeError as error:
+        print(
+            "\nAn error was encountered with the JSON data. The data provided: \n", data
+        )
+        print("\nThe error message: \n", error)
 
 
 def message(service, up_to_date, latest, installed):
+    """Displays the end result message"""
     if up_to_date is True:
         click.echo(
             " - "
@@ -222,7 +281,7 @@ def main(inputfile):
     up_to_date = True
     click.echo(
         click.style(
-            """
+            r"""
 +---------------------------------------------------------------------------------------------------------+
 |                           _                                              _   ___  _                     |
 |                          | |        _                              _    (_) / __)(_)                    |
@@ -237,23 +296,24 @@ def main(inputfile):
         )
     )
     default("Gathering informations...\n")
-    with open(inputfile) as f:
-        data = json.load(f)
+    with open(inputfile) as file:
+        data = json.load(file)
 
     # Progressbar
-    bar = IncrementalBar("Processing", max=5)
+    progressbar = IncrementalBar("Processing", max=5)
     for i in range(1):
         latest_pfsense_version = pfsense()
-        bar.next()
+        progressbar.next()
         latest_synology_dsm_version = synology_dsm()
-        bar.next()
-        latest_synology_plex_version = synology_plex()["nas"]["Synology"]["version"]
-        bar.next()
+        progressbar.next()
+        latest_synology_plex_version = synology_plex()
+        progressbar.next()
         latest_unifi_ck_version = unifi()
-        bar.next()
-        latest_wordpress_version = wordpress()["offers"][0]["current"]
-        bar.next()
-        bar.finish()
+        progressbar.next()
+        # latest_wordpress_version = wordpress()["offers"][0]["current"]
+        latest_wordpress_version = wordpress()
+        progressbar.next()
+        progressbar.finish()
     default("\n")
     installed_pfsense_version = data["networking"]["firewall"]["pfsense"]
     installed_synology_dsm_version = data["storage"]["nas"]["synology"]["dsm"]
@@ -305,8 +365,8 @@ def main(inputfile):
     try:
         requests.get(HEALTHCHECK)
         print("The Healthchecks Ping URL was succesfully contacted.")
-    except requests.exceptions.RequestException as e:
-        raise SystemExit("")
+    except requests.exceptions.RequestException as error_message:
+        raise SystemExit(error_message)
 
 
 if __name__ == "__main__":
