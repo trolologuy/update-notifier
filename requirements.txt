@@ -3,6 +3,6 @@ colorama==0.4.4
 click==7.1.2
 lxml==4.6.3
 progress==1.5
-regex==2021.3.17
+regex==2021.4.4
 requests==2.25.1
 selenium==3.141.0
