@@ -4,5 +4,5 @@ click==7.1.2
 lxml==4.6.3
 progress==1.6
 regex==2021.3.17
-requests==2.25.1
+requests==2.26.0
 selenium==3.141.0
