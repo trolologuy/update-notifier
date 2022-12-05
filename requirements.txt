@@ -5,4 +5,4 @@ lxml==4.8.0
 progress==1.6
 regex==2022.1.18
 requests==2.26.0
-selenium==4.1.0
+selenium==4.7.2
